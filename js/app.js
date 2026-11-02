@@ -1,6 +1,6 @@
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-let C, S = {}, sel = null, checks = 0, qi = 0, score = 0, lines = [];
+let C, S = {}, sel = null, checks = 0, qi = 0, score = 0, lines = [], Q = [], nNotes = 0;
 
 let MAN = {}, player = null, token = 0;
 function stopAll() {
@@ -23,7 +23,9 @@ function say(t, done) {
   player.play().catch(fallback);
 }
 function sayAll(arr) { let i = 0; const go = () => { if (i < arr.length) say(arr[i++], go); }; go(); }
-const spoken = t => t.replace(/\{(\d+)\}/g, 'blank $1').replace(/\+/g, ' plus ').replace(/=/g, ' equals ').replace(/^- /, '');
+const L = l => typeof l === 'string' ? { t: l } : l;
+const spoken = l => (l.say || l.t.replace(/\{(\d+)\}/g, 'blank $1').replace(/\+/g, ' plus ').replace(/=/g, ' equals ').replace(/^- /, '')) + (l.d ? '. ' + l.d : '');
+const picHTML = o => o.img ? `<img class="pic" src="${esc(o.img)}" alt="">` : o.pic ? `<span class="pic" aria-hidden="true">${o.pic}</span>` : '';
 const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
 const sayFor = w => { const b = Object.values(C.blanks).find(b => b.answer === w); return (b && b.say) || w; };
 
@@ -33,14 +35,21 @@ function lineHTML(raw, full) {
     : `<span class="bw"><button class="blank" data-n="${n}" aria-label="Blank ${n}">${n}</button><span class="hint" hidden></span></span>`);
 }
 
+function blockHTML(l, full) {
+  l = L(l);
+  const item = l.t.startsWith('- ') && !l.pic && !l.img;
+  if (!full) lines.push(spoken(l));
+  const btn = full ? '' : `<button class="spk" data-i="${lines.length - 1}" aria-label="Read this line">🔊</button>`;
+  return `<div class="line${item ? ' item' : ''}">${picHTML(l)}<div class="t">${l.d ? `<b>${lineHTML(l.t, full)}</b><span class="d">${esc(l.d)}</span>` : lineHTML(l.t, full)}</div>${btn}</div>`;
+}
+const secHTML = (secs, full) => secs.map(s => `<h2>${esc(s.heading)}</h2>` + s.lines.map(l => blockHTML(l, full)).join('')).join('');
+
 function render() {
   $('#title').textContent = C.title;
   document.title = C.title + ' | smartnotes';
-  let i = 0;
-  $('#sections').innerHTML = C.sections.map(s => `<h2>${esc(s.heading)}</h2>` + s.lines.map(l => {
-    lines.push(spoken(l));
-    return `<div class="line${l.startsWith('- ') ? ' item' : ''}"><div class="t">${lineHTML(l)}</div><button class="spk" data-i="${i++}" aria-label="Read this line">🔊</button></div>`;
-  }).join('')).join('');
+  $('#notesBody').innerHTML = secHTML(C.notes, false);
+  nNotes = lines.length;
+  $('#sections').innerHTML = secHTML(C.sections, false);
   Object.keys(C.blanks).forEach(n => S[n] = { word: null, ok: false, hinted: false, wrong: false });
   C.bank = shuffle(Object.values(C.blanks).map(b => b.answer));
   paint();
@@ -99,21 +108,23 @@ function jump() {
 }
 
 function startQuiz() {
+  Q = shuffle(C.quiz);
   $('#read').hidden = true; $('#bar').hidden = true; $('#quiz').hidden = false;
   window.scrollTo(0, 0); showQ();
 }
 const qSay = q => `${q.say || q.text}. Traditional or modern?`;
 function showQ() {
-  const q = C.quiz[qi];
+  const q = Q[qi];
   $('#qn').textContent = `Question ${qi + 1} of ${C.quiz.length}`;
   $('#qt').textContent = q.text;
+  $('#qpic').innerHTML = picHTML(q);
   $('#qfb').textContent = ''; $('#qfb').className = 'fb';
   $('#qnext').hidden = true;
   document.querySelectorAll('.choice').forEach(b => b.disabled = false);
   say(qSay(q));
 }
 function answer(a) {
-  const q = C.quiz[qi], good = a === q.answer;
+  const q = Q[qi], good = a === q.answer;
   if (good) score++;
   const msg = (good ? 'Correct! ' : `Not quite. It is ${q.answer}. `) + q.why;
   $('#qfb').className = 'fb ' + (good ? 'good' : 'bad');
@@ -135,10 +146,9 @@ function finish() {
    <p><button class="main" onclick="window.print()">Save as PDF</button> <button class="ghost" onclick="location.reload()">Try again</button></p>
    <p class="how">In the print window, choose "Save as PDF" as the printer.</p></div>
    <h1>${esc(C.title)} Reviewer</h1>` +
-   C.sections.map(s => `<h2>${esc(s.heading)}</h2>` + s.lines.map(l =>
-     `<div class="line${item(l) ? ' item' : ''}"><div class="t">${lineHTML(l, true)}</div></div>`).join('')).join('') +
+   secHTML(C.notes, true) + secHTML(C.sections, true) +
    `<h2>Traditional or Modern?</h2><table><tr><th>Example</th><th>Type</th><th>Why</th></tr>` +
-   C.quiz.map(q => `<tr><td>${esc(q.text)}</td><td>${q.answer}</td><td>${esc(q.why)}</td></tr>`).join('') + `</table>`;
+   C.quiz.map(q => `<tr><td>${q.pic || ''} ${esc(q.text)}</td><td>${q.answer}</td><td>${esc(q.why)}</td></tr>`).join('') + `</table>`;
   window.scrollTo(0, 0);
 }
 
@@ -169,8 +179,10 @@ fetch('content/library.json').then(r => r.json()).then(async lib => {
   render();
   $('#check').onclick = check; $('#jump').onclick = jump;
   $('#startq').onclick = startQuiz; $('#qnext').onclick = next;
-  $('#qspk').onclick = () => say(qSay(C.quiz[qi]));
-  $('#readall').onclick = () => sayAll(lines);
+  $('#qspk').onclick = () => say(qSay(Q[qi]));
+  $('#readall').onclick = () => sayAll(lines.slice(nNotes));
+  $('#readnotes').onclick = () => sayAll(lines.slice(0, nNotes));
+  $('#begin').onclick = () => { stopAll(); $('#notes').hidden = true; $('#read').hidden = false; $('#bar').hidden = false; window.scrollTo(0, 0); };
 }).catch(() => {
   const e = $('#err'); e.hidden = false;
   e.textContent = 'Could not load the reviewer. Open this site from its web address, not from the file.';

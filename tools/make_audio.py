@@ -11,13 +11,16 @@ OUT = ROOT / "audio"
 FFMPEG = shutil.which("ffmpeg")
 EXT = ".mp3" if FFMPEG else ".wav"
 
-def spoken(t):  # must match spoken() in js/app.js
-    t = re.sub(r"\{(\d+)\}", r"blank \1", t)
-    return t.replace("+", " plus ").replace("=", " equals ").removeprefix("- ")
+def spoken(l):  # must match spoken() in js/app.js
+    if isinstance(l, str): l = {"t": l}
+    d = ". " + l["d"] if l.get("d") else ""
+    if l.get("say"): return l["say"] + d
+    t = re.sub(r"\{(\d+)\}", r"blank \1", l["t"])
+    return t.replace("+", " plus ").replace("=", " equals ").removeprefix("- ") + d
 
 def texts(c):
     out = []
-    for s in c["sections"]:
+    for s in c.get("notes", []) + c["sections"]:
         out += [spoken(l) for l in s["lines"]]
     for n, b in c["blanks"].items():
         out += [b.get("say") or b["answer"], f"Blank {n}"]

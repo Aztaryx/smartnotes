@@ -11,7 +11,13 @@
   <a class="brand" href="index.html">smartnotes</a>
   <h1 id="title"></h1>
  </header>
- <section id="read">
+ <section id="notes">
+  <p class="how">Read the notes first. Tap 🔊 to hear any line.</p>
+  <button id="readnotes" class="ghost">🔊 Read all notes</button>
+  <div id="notesBody"></div>
+  <p><button id="begin" class="main">I read the notes. Start Part 1 and 2</button></p>
+ </section>
+ <section id="read" hidden>
   <p class="how">Tap a word, then tap a number to place it. On a laptop you can drag it too. Tap 🔊 to hear any line.</p>
   <button id="readall" class="ghost">🔊 Read everything</button>
   <div id="bank" class="bank" aria-label="Word bank"></div>
@@ -19,6 +25,7 @@
  </section>
  <section id="quiz" hidden>
   <p id="qn" class="how"></p>
+  <div id="qpic"></div>
   <p id="qt" class="qtext"></p>
   <button id="qspk" class="ghost">🔊 Read it</button>
   <div class="choices">
@@ -31,7 +38,7 @@
  <section id="full" hidden></section>
  <p id="err" class="err" hidden></p>
 </main>
-<div id="bar" class="bar">
+<div id="bar" class="bar" hidden>
  <span id="msg"></span>
  <button id="jump" class="ghost" hidden>Go to next wrong</button>
  <button id="check" class="main" disabled>Check answers</button>
