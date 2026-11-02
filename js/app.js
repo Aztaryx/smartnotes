@@ -2,13 +2,27 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 let C, S = {}, sel = null, checks = 0, qi = 0, score = 0, lines = [];
 
-function say(t) {
-  if (!('speechSynthesis' in window)) return;
-  speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(t);
-  u.lang = 'en-US'; u.rate = 0.9;
-  speechSynthesis.speak(u);
+let MAN = {}, player = null, token = 0;
+function stopAll() {
+  token++;
+  if (player) { player.pause(); player = null; }
+  if ('speechSynthesis' in window) speechSynthesis.cancel();
 }
+function say(t, done) {
+  stopAll();
+  const my = token, d = done && (() => { if (my === token) done(); });
+  const fallback = () => {
+    if (!('speechSynthesis' in window)) return d && d();
+    const u = new SpeechSynthesisUtterance(t);
+    u.lang = 'en-US'; u.rate = 0.9; if (d) u.onend = d;
+    speechSynthesis.speak(u);
+  };
+  if (!MAN[t]) return fallback();
+  player = new Audio('audio/' + MAN[t]);
+  player.onended = d || null;
+  player.play().catch(fallback);
+}
+function sayAll(arr) { let i = 0; const go = () => { if (i < arr.length) say(arr[i++], go); }; go(); }
 const spoken = t => t.replace(/\{(\d+)\}/g, 'blank $1').replace(/\+/g, ' plus ').replace(/=/g, ' equals ').replace(/^- /, '');
 const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
 const sayFor = w => { const b = Object.values(C.blanks).find(b => b.answer === w); return (b && b.say) || w; };
@@ -151,11 +165,12 @@ fetch('content/library.json').then(r => r.json()).then(async lib => {
   const id = new URLSearchParams(location.search).get('topic');
   const t = lib.find(x => x.id === id) || lib[0];
   C = await (await fetch('content/' + t.file)).json();
+  MAN = await fetch('audio/manifest.json').then(r => r.ok ? r.json() : {}).catch(() => ({}));
   render();
   $('#check').onclick = check; $('#jump').onclick = jump;
   $('#startq').onclick = startQuiz; $('#qnext').onclick = next;
   $('#qspk').onclick = () => say(qSay(C.quiz[qi]));
-  $('#readall').onclick = () => say(lines.join(' ... '));
+  $('#readall').onclick = () => sayAll(lines);
 }).catch(() => {
   const e = $('#err'); e.hidden = false;
   e.textContent = 'Could not load the reviewer. Open this site from its web address, not from the file.';
