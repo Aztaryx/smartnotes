@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>smartnotes</title>
+<link rel="stylesheet" href="css/style.css"></head>
+<body><main class="wrap">
+<h1 class="brand">smartnotes</h1>
+<p class="sub">Pick a reviewer.</p>
+<div id="list" class="list"></div>
+<p id="err" class="err" hidden></p>
+</main>
+<script>
+fetch('content/library.json').then(r=>r.json()).then(lib=>{
+  if(lib.length===1){location.replace('reviewer.html?topic='+lib[0].id);return;}
+  document.getElementById('list').innerHTML=lib.map(t=>
+    `<a class="topic" href="reviewer.html?topic=${t.id}"><b>${t.title}</b><span>${t.blurb||''}</span></a>`).join('');
+}).catch(()=>{const e=document.getElementById('err');e.hidden=false;e.textContent='Could not load the reviewers. Open this site from its web address, not from the file.';});
+</script></body></html>

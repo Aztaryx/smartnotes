@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>smartnotes reviewer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css"></head>
+<body>
+<main class="wrap" id="app">
+ <header class="top">
+  <a class="brand" href="index.html">smartnotes</a>
+  <h1 id="title"></h1>
+ </header>
+ <section id="read">
+  <p class="how">Tap a word, then tap a number to place it. On a laptop you can drag it too. Tap 🔊 to hear any line.</p>
+  <button id="readall" class="ghost">🔊 Read everything</button>
+  <div id="bank" class="bank" aria-label="Word bank"></div>
+  <div id="sections"></div>
+ </section>
+ <section id="quiz" hidden>
+  <p id="qn" class="how"></p>
+  <p id="qt" class="qtext"></p>
+  <button id="qspk" class="ghost">🔊 Read it</button>
+  <div class="choices">
+   <button class="choice trad" data-a="Traditional">Traditional</button>
+   <button class="choice mod" data-a="Modern">Modern</button>
+  </div>
+  <p id="qfb" class="fb" aria-live="polite"></p>
+  <button id="qnext" class="main" hidden>Next</button>
+ </section>
+ <section id="full" hidden></section>
+ <p id="err" class="err" hidden></p>
+</main>
+<div id="bar" class="bar">
+ <span id="msg"></span>
+ <button id="jump" class="ghost" hidden>Go to next wrong</button>
+ <button id="check" class="main" disabled>Check answers</button>
+ <button id="startq" class="main" hidden>Start quiz</button>
+</div>
+<script src="js/app.js"></script>
+</body></html>

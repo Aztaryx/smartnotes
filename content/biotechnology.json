@@ -1,0 +1,41 @@
+{
+ "title": "Biotechnology",
+ "sections": [
+  {"heading": "Part 1: Traditional Biotechnology", "lines": [
+   "Biotechnology means using living things to make useful products. Traditional biotechnology uses tiny living things like bacteria, yeast, and molds to make food. This process is called {1}. People have been doing it for a very long time.",
+   "- Milk + bacteria = {2}. Example: the white or yellow food on pizza.",
+   "- Soybeans + mold = {3}. Example: the salty brown sauce for adobo.",
+   "- Sugar + yeast, then bacteria = {4}. Example: the sour liquid for pickling.",
+   "- Coconut water + bacteria = {5}. Example: the chewy, jelly-like sweet in halo-halo."
+  ]},
+  {"heading": "Part 2: Modern Biotechnology", "lines": [
+   "Modern biotechnology changes the {6} (DNA) of living things in a laboratory. The result is a GMO, a \"genetically modified organism.\"",
+   "- {7} is corn with a gene from a bacterium that keeps insect pests away.",
+   "- {8} is rice made with extra vitamin A.",
+   "- {9} is a medicine for diabetes, made by bacteria that were given a human gene.",
+   "- {10} (in vitro fertilization) joins an egg and a sperm in a lab dish to help a couple have a baby."
+  ]}
+ ],
+ "blanks": {
+  "1": {"answer": "fermentation", "hint": "Tiny living things break down sugar to make food."},
+  "2": {"answer": "cheese", "hint": "It is made from milk and is stretchy when hot."},
+  "3": {"answer": "soy sauce", "hint": "Soybeans are in the name."},
+  "4": {"answer": "vinegar", "hint": "It is sour. Think of pickles."},
+  "5": {"answer": "nata de coco", "hint": "It starts with coconut water.", "say": "nah-tah deh koh-koh"},
+  "6": {"answer": "genes", "hint": "DNA is made of these. They carry instructions."},
+  "7": {"answer": "Bt corn", "hint": "It is a corn. The bacterium is called Bt.", "say": "B T corn"},
+  "8": {"answer": "Golden Rice", "hint": "A rice. Its color gives the name."},
+  "9": {"answer": "insulin", "hint": "A medicine that helps people with diabetes."},
+  "10": {"answer": "IVF", "hint": "The letters stand for in vitro fertilization.", "say": "I V F"}
+ },
+ "quiz": [
+  {"text": "Yogurt", "answer": "Traditional", "why": "Milk fermented by bacteria."},
+  {"text": "Bt eggplant", "answer": "Modern", "why": "An eggplant with a bacterial gene against pests.", "say": "B T eggplant"},
+  {"text": "Bagoong", "answer": "Traditional", "why": "Fish or shrimp fermented with salt.", "say": "bah-go-ong"},
+  {"text": "Rainbow papaya", "answer": "Modern", "why": "A papaya modified to resist a virus."},
+  {"text": "Tapuy", "answer": "Traditional", "why": "Rice wine fermented by yeast.", "say": "tah-pooy"},
+  {"text": "Insulin made by bacteria", "answer": "Modern", "why": "Bacteria were given a human gene."},
+  {"text": "Bread", "answer": "Traditional", "why": "Dough rises when yeast ferments."},
+  {"text": "IVF", "answer": "Modern", "why": "An egg and a sperm are joined in a lab dish.", "say": "I V F"}
+ ]
+}
